@@ -240,7 +240,7 @@ npm run build
 |--------------------|-----------------|---------|
 | `data-vdo` | `data-video` | Root marker |
 | `data-vdo-src` | `data-video-src` | Video URL |
-| `data-vdo-mode` | `data-video-mode` | `modal` or `inline` |
+| `data-vdo-mode` | `data-video-mode` | `modal`, `inline`, or `preview` |
 | `data-vdo-autoplay` | `data-video-autoplay` | `1` or `0` |
 | `data-vdo-muted` | `data-video-muted` | `1` or `0` |
 | `data-vdo-ratio` | `data-video-ratio` | e.g., `16/9` |
@@ -326,10 +326,15 @@ npm run build    # Build all props
 
 ## Publishing
 
-```bash
-npm version patch  # or minor/major
-npm publish
-```
+Publishing is automated via GitHub Actions. Every push to `main` triggers `npm publish`.
+
+**IMPORTANT: You MUST bump the version in `package.json` before pushing.** npm rejects duplicate versions, so the publish will fail if the version hasn't changed.
+
+- **Bug fix / small tweak:** bump patch (`1.1.0` -> `1.1.1`)
+- **New feature / new mode:** bump minor (`1.1.0` -> `1.2.0`)
+- **Breaking change:** bump major (`1.1.0` -> `2.0.0`)
+
+The workflow lives at `.github/workflows/publish.yml` and uses the `NPM_TOKEN` secret.
 
 Props become available at:
 ```
