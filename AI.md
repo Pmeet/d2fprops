@@ -326,19 +326,13 @@ npm run build    # Build all props
 
 ## Publishing
 
-Publishing is automated via GitHub Actions. Every push to `main` triggers `npm publish`.
+The `dist/` folder is committed to git. jsDelivr serves files directly from the GitHub repo — no npm needed.
 
-**IMPORTANT: You MUST bump the version in `package.json` before pushing.** npm rejects duplicate versions, so the publish will fail if the version hasn't changed.
+**IMPORTANT: Always run `npm run build` before committing.** The built files in `dist/` are what jsDelivr serves.
 
-- **Bug fix / small tweak:** bump patch (`1.1.0` -> `1.1.1`)
-- **New feature / new mode:** bump minor (`1.1.0` -> `1.2.0`)
-- **Breaking change:** bump major (`1.1.0` -> `2.0.0`)
-
-The workflow lives at `.github/workflows/publish.yml` and uses the `NPM_TOKEN` secret.
-
-Props become available at:
+Props are available via jsDelivr GitHub CDN at:
 ```
-https://cdn.jsdelivr.net/npm/d2fprops/dist/{prop}/{prop}.bundle.min.js
+https://cdn.jsdelivr.net/gh/Pmeet/d2fprops@main/dist/{prop}/{prop}.bundle.min.js
 ```
 
 ---

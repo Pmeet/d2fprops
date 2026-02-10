@@ -10,17 +10,17 @@ Add this to your Webflow site's **Custom Code** section (in Project Settings or 
 
 ```html
 <!-- All-in-one (JS + CSS included) -->
-<script defer src="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.bundle.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/Pmeet/d2fprops@main/dist/video/video.bundle.min.js"></script>
 ```
 
 **Or** load CSS separately in the `<head>` for better performance:
 
 ```html
 <!-- In <head> -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Pmeet/d2fprops@main/dist/video/video.min.css">
 
 <!-- Before </body> -->
-<script defer src="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/Pmeet/d2fprops@main/dist/video/video.min.js"></script>
 ```
 
 ---
@@ -136,7 +136,7 @@ For custom video controls, include [Plyr](https://plyr.io/) before this script:
 ```html
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.bundle.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/Pmeet/d2fprops@main/dist/video/video.bundle.min.js"></script>
 ```
 
 ---
