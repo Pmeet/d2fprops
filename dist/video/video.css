@@ -15,7 +15,7 @@
 [data-video] {
   position: relative;
   width: 100%;
-  border-radius: 16px;
+  border-radius: inherit;
   overflow: hidden;
   background-color: #000;
   background-position: center !important;
@@ -67,6 +67,14 @@
 [data-vdo][data-vdo-mode="preview"] .d2f-video__inner,
 [data-video][data-video-mode="preview"] .d2f-video__inner {
   pointer-events: none;
+  overflow: hidden;
+}
+
+/* Scale up YouTube iframe to crop out residual title bar and watermark */
+[data-vdo][data-vdo-mode="preview"] .d2f-video__inner iframe,
+[data-video][data-video-mode="preview"] .d2f-video__inner iframe {
+  transform: scale(1.15);
+  transform-origin: center center;
 }
 
 /* ================================

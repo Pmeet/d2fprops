@@ -199,8 +199,11 @@ var d2f_video = (() => {
       document.removeEventListener("keydown", modal._onKey);
       modal._onKey = void 0;
     }
-    if (lastActiveEl && typeof lastActiveEl.focus === "function") {
-      lastActiveEl.focus();
+    if (lastActiveEl) {
+      resumePreview(lastActiveEl);
+      if (typeof lastActiveEl.focus === "function") {
+        lastActiveEl.focus();
+      }
     }
   }
   function openModal() {
@@ -273,7 +276,11 @@ var d2f_video = (() => {
       playsinline: "1",
       rel: "0",
       showinfo: "0",
-      disablekb: "1"
+      disablekb: "1",
+      enablejsapi: "1",
+      iv_load_policy: "3",
+      fs: "0",
+      cc_load_policy: "0"
     });
     const iframe = document.createElement("iframe");
     iframe.src = `${YT_PRIVACY_DOMAIN}/embed/${id}?${params.toString()}`;
@@ -323,11 +330,13 @@ var d2f_video = (() => {
       const iframe = buildPreviewYouTubeIframe(src);
       if (iframe) {
         inner.appendChild(iframe);
+        el._d2fPreviewEl = iframe;
         togglePlayOverlay(el, true);
       }
     } else if (isVideoFileUrl(src)) {
       const vid = buildPreviewHtml5Video(src);
       inner.appendChild(vid);
+      el._d2fPreviewEl = vid;
       togglePlayOverlay(el, true);
       setTimeout(() => {
         try {
@@ -335,6 +344,35 @@ var d2f_video = (() => {
         } catch (_e) {
         }
       }, 0);
+    }
+  }
+  function pausePreview(el) {
+    const preview = el._d2fPreviewEl;
+    if (!preview)
+      return;
+    if (preview instanceof HTMLVideoElement) {
+      preview.pause();
+    } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
+      preview.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
+        "*"
+      );
+    }
+  }
+  function resumePreview(el) {
+    const preview = el._d2fPreviewEl;
+    if (!preview)
+      return;
+    if (preview instanceof HTMLVideoElement) {
+      try {
+        preview.play();
+      } catch (_e) {
+      }
+    } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
+      preview.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+        "*"
+      );
     }
   }
   function observePreview(el, src, inner) {
@@ -393,7 +431,9 @@ var d2f_video = (() => {
         e.stopPropagation();
       }
       lastActiveEl = el;
-      if (mode !== "preview") {
+      if (mode === "preview") {
+        pausePreview(el);
+      } else {
         inner.innerHTML = "";
       }
       const modalAutoplay = mode === "preview" ? true : autoplay;

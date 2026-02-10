@@ -57,6 +57,7 @@ const CSS_PREFIX = "d2f-video";
 
 interface VideoElement extends HTMLElement {
   _d2fVideoInit?: boolean;
+  _d2fPreviewEl?: HTMLVideoElement | HTMLIFrameElement;
 }
 
 interface VideoModal extends HTMLElement {
@@ -300,8 +301,12 @@ function closeModal(): void {
     modal._onKey = undefined;
   }
 
-  if (lastActiveEl && typeof lastActiveEl.focus === "function") {
-    lastActiveEl.focus();
+  if (lastActiveEl) {
+    // Resume preview if the element that opened the modal was in preview mode
+    resumePreview(lastActiveEl as VideoElement);
+    if (typeof lastActiveEl.focus === "function") {
+      lastActiveEl.focus();
+    }
   }
 }
 
@@ -406,6 +411,10 @@ function buildPreviewYouTubeIframe(src: string): HTMLIFrameElement | null {
     rel: "0",
     showinfo: "0",
     disablekb: "1",
+    enablejsapi: "1",
+    iv_load_policy: "3",
+    fs: "0",
+    cc_load_policy: "0",
   });
 
   const iframe = document.createElement("iframe");
@@ -470,20 +479,56 @@ function enhanceWithPlyr(mediaEl: HTMLVideoElement | HTMLIFrameElement): void {
 /**
  * Mount and start a muted, looping preview player inside the element
  */
-function startPreview(el: HTMLElement, src: string, inner: HTMLElement): void {
+function startPreview(el: VideoElement, src: string, inner: HTMLElement): void {
   if (isYouTubeUrl(src)) {
     const iframe = buildPreviewYouTubeIframe(src);
     if (iframe) {
       inner.appendChild(iframe);
+      el._d2fPreviewEl = iframe;
       togglePlayOverlay(el, true);
     }
   } else if (isVideoFileUrl(src)) {
     const vid = buildPreviewHtml5Video(src);
     inner.appendChild(vid);
+    el._d2fPreviewEl = vid;
     togglePlayOverlay(el, true);
     setTimeout(() => {
       try { vid.play(); } catch (_e) { /* autoplay may be blocked */ }
     }, 0);
+  }
+}
+
+/**
+ * Pause the preview player (called when modal opens)
+ */
+function pausePreview(el: VideoElement): void {
+  const preview = el._d2fPreviewEl;
+  if (!preview) return;
+
+  if (preview instanceof HTMLVideoElement) {
+    preview.pause();
+  } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
+    preview.contentWindow.postMessage(
+      JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
+      "*"
+    );
+  }
+}
+
+/**
+ * Resume the preview player (called when modal closes)
+ */
+function resumePreview(el: VideoElement): void {
+  const preview = el._d2fPreviewEl;
+  if (!preview) return;
+
+  if (preview instanceof HTMLVideoElement) {
+    try { preview.play(); } catch (_e) { /* ignore */ }
+  } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
+    preview.contentWindow.postMessage(
+      JSON.stringify({ event: "command", func: "playVideo", args: [] }),
+      "*"
+    );
   }
 }
 
@@ -573,8 +618,10 @@ function initOne(el: VideoElement): void {
     }
     lastActiveEl = el;
 
-    // In preview mode, keep the inline preview playing (don't clear inner)
-    if (mode !== "preview") {
+    // In preview mode, pause the preview and keep it in the DOM (don't clear inner)
+    if (mode === "preview") {
+      pausePreview(el);
+    } else {
       inner.innerHTML = "";
     }
 
