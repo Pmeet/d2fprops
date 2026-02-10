@@ -389,6 +389,57 @@ function buildHtml5Video(src: string, autoplay: boolean, muted: boolean): HTMLVi
 }
 
 /**
+ * Create a YouTube iframe for muted, looping preview playback (no controls)
+ */
+function buildPreviewYouTubeIframe(src: string): HTMLIFrameElement | null {
+  const id = getYouTubeId(src);
+  if (!id) return null;
+
+  const params = new URLSearchParams({
+    autoplay: "1",
+    mute: "1",
+    loop: "1",
+    playlist: id,
+    controls: "0",
+    modestbranding: "1",
+    playsinline: "1",
+    rel: "0",
+    showinfo: "0",
+    disablekb: "1",
+  });
+
+  const iframe = document.createElement("iframe");
+  iframe.src = `${YT_PRIVACY_DOMAIN}/embed/${id}?${params.toString()}`;
+  iframe.setAttribute("title", "Video preview");
+  iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture");
+  iframe.setAttribute("allowfullscreen", "true");
+  iframe.setAttribute("frameborder", "0");
+  iframe.loading = "eager";
+  iframe.style.pointerEvents = "none";
+
+  return iframe;
+}
+
+/**
+ * Create an HTML5 video element for muted, looping preview playback (no controls)
+ */
+function buildPreviewHtml5Video(src: string): HTMLVideoElement {
+  const video = document.createElement("video");
+  video.setAttribute("playsinline", "");
+  video.autoplay = true;
+  video.muted = true;
+  video.loop = true;
+  video.style.pointerEvents = "none";
+
+  const source = document.createElement("source");
+  source.src = src;
+  source.type = /\.webm(\?.*)?$/i.test(src) ? "video/webm" : "video/mp4";
+  video.appendChild(source);
+
+  return video;
+}
+
+/**
  * Enhance a video/iframe with Plyr if available
  */
 function enhanceWithPlyr(mediaEl: HTMLVideoElement | HTMLIFrameElement): void {
@@ -410,6 +461,49 @@ function enhanceWithPlyr(mediaEl: HTMLVideoElement | HTMLIFrameElement): void {
   } catch (e) {
     activePlayer = null;
   }
+}
+
+// ============================================================
+// PREVIEW MODE
+// ============================================================
+
+/**
+ * Mount and start a muted, looping preview player inside the element
+ */
+function startPreview(el: HTMLElement, src: string, inner: HTMLElement): void {
+  if (isYouTubeUrl(src)) {
+    const iframe = buildPreviewYouTubeIframe(src);
+    if (iframe) {
+      inner.appendChild(iframe);
+      togglePlayOverlay(el, true);
+    }
+  } else if (isVideoFileUrl(src)) {
+    const vid = buildPreviewHtml5Video(src);
+    inner.appendChild(vid);
+    togglePlayOverlay(el, true);
+    setTimeout(() => {
+      try { vid.play(); } catch (_e) { /* autoplay may be blocked */ }
+    }, 0);
+  }
+}
+
+/**
+ * Observe element visibility and start preview when ~5% visible from viewport top
+ */
+function observePreview(el: HTMLElement, src: string, inner: HTMLElement): void {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          startPreview(el, src, inner);
+          observer.disconnect();
+          return;
+        }
+      }
+    },
+    { rootMargin: "-5% 0px 0px 0px", threshold: 0 }
+  );
+  observer.observe(el);
 }
 
 // ============================================================
@@ -450,17 +544,24 @@ function initOne(el: VideoElement): void {
     el.appendChild(inner);
   }
 
-  // Accessibility
-  if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
-  if (!el.hasAttribute("role")) el.setAttribute("role", "button");
-  if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", "Play video");
-
   // Parse options with fallback to legacy attributes
   const mode = (getAttr(el, ATTR_NEW.MODE, ATTR_LEGACY.MODE) || "modal").toLowerCase();
   const autoplay = (getAttr(el, ATTR_NEW.AUTOPLAY, ATTR_LEGACY.AUTOPLAY) || "1") === "1";
   const muted = (getAttr(el, ATTR_NEW.MUTED, ATTR_LEGACY.MUTED) || "0") === "1";
 
+  // Accessibility
+  if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+  if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+  if (!el.hasAttribute("aria-label")) {
+    el.setAttribute("aria-label", mode === "preview" ? "Play full video" : "Play video");
+  }
+
   const inner = el.querySelector<HTMLElement>(`.${CSS_PREFIX}__inner`)!;
+
+  // Preview mode: set up IntersectionObserver to start preview when scrolled into view
+  if (mode === "preview") {
+    observePreview(el, src, inner);
+  }
 
   /**
    * Play handler
@@ -471,11 +572,19 @@ function initOne(el: VideoElement): void {
       e.stopPropagation();
     }
     lastActiveEl = el;
-    inner.innerHTML = "";
+
+    // In preview mode, keep the inline preview playing (don't clear inner)
+    if (mode !== "preview") {
+      inner.innerHTML = "";
+    }
+
+    // For preview mode, modal player always starts unmuted with autoplay from 0:00
+    const modalAutoplay = mode === "preview" ? true : autoplay;
+    const modalMuted = mode === "preview" ? false : muted;
 
     // YouTube video
     if (isYouTubeUrl(src)) {
-      const iframe = buildYouTubeIframe(src, autoplay);
+      const iframe = buildYouTubeIframe(src, modalAutoplay);
       if (!iframe) return;
 
       if (mode === "inline") {
@@ -546,7 +655,7 @@ function initOne(el: VideoElement): void {
           }
         }
 
-        const vid = buildHtml5Video(src, autoplay, muted);
+        const vid = buildHtml5Video(src, modalAutoplay, modalMuted);
         modalInner?.appendChild(vid);
         enhanceWithPlyr(vid);
         setTimeout(() => {

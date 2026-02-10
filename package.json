@@ -1,12 +1,12 @@
 {
   "name": "d2fprops",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Attribute-based props for Webflow. Video player, and more coming soon.",
   "author": "Your Name",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourname/d2fprops"
+    "url": "https://github.com/Pmeet/d2fprops"
   },
   "keywords": [
     "webflow",

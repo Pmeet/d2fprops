@@ -41,7 +41,7 @@ That's it! Click the element to play the video in a modal.
 |-----------|-------------|---------|
 | `data-vdo` | Marks element as video container | Required |
 | `data-vdo-src` | Video URL (YouTube or .mp4/.webm file) | Required |
-| `data-vdo-mode` | `modal` (popup) or `inline` (plays in place) | `modal` |
+| `data-vdo-mode` | `modal` (popup), `inline` (plays in place), or `preview` (muted loop + click for modal) | `modal` |
 | `data-vdo-autoplay` | Auto-play when clicked: `1` or `0` | `1` |
 | `data-vdo-muted` | Start muted: `1` or `0` | `0` |
 | `data-vdo-ratio` | Aspect ratio: `16/9`, `4/3`, `1/1`, etc. | `16/9` |
@@ -76,6 +76,18 @@ That's it! Click the element to play the video in a modal.
 
 ```html
 <div data-vdo data-vdo-src="..." data-vdo-ratio="4/3"></div>
+```
+
+### Preview Mode (Muted Loop + Click for Full Video)
+
+Video autoplays muted when scrolled into view. Click opens the full video in a modal from the beginning.
+
+```html
+<div data-vdo data-vdo-src="https://www.youtube.com/watch?v=dQw4w9WgXcQ" data-vdo-mode="preview"></div>
+```
+
+```html
+<div data-video data-video-src="https://example.com/video.mp4" data-video-mode="preview"></div>
 ```
 
 ### With Play Button Overlay

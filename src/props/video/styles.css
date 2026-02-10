@@ -61,6 +61,15 @@
 }
 
 /* ================================
+   Preview Mode
+   ================================ */
+
+[data-vdo][data-vdo-mode="preview"] .d2f-video__inner,
+[data-video][data-video-mode="preview"] .d2f-video__inner {
+  pointer-events: none;
+}
+
+/* ================================
    Modal Overlay
    ================================ */
 
