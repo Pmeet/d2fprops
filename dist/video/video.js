@@ -266,6 +266,7 @@ var d2f_video = (() => {
     const id = getYouTubeId(src);
     if (!id)
       return null;
+    const pageOrigin = typeof window !== "undefined" ? window.location.origin : "";
     const params = new URLSearchParams({
       autoplay: "1",
       mute: "1",
@@ -278,6 +279,7 @@ var d2f_video = (() => {
       showinfo: "0",
       disablekb: "1",
       enablejsapi: "1",
+      origin: pageOrigin,
       iv_load_policy: "3",
       fs: "0",
       cc_load_policy: "0"
@@ -346,17 +348,22 @@ var d2f_video = (() => {
       }, 0);
     }
   }
+  function ytCommand(iframe, func) {
+    if (!iframe.contentWindow)
+      return;
+    iframe.contentWindow.postMessage(
+      JSON.stringify({ event: "command", func, args: "" }),
+      YT_PRIVACY_DOMAIN
+    );
+  }
   function pausePreview(el) {
     const preview = el._d2fPreviewEl;
     if (!preview)
       return;
     if (preview instanceof HTMLVideoElement) {
       preview.pause();
-    } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
-      preview.contentWindow.postMessage(
-        JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
-        "*"
-      );
+    } else if (preview instanceof HTMLIFrameElement) {
+      ytCommand(preview, "pauseVideo");
     }
   }
   function resumePreview(el) {
@@ -368,11 +375,8 @@ var d2f_video = (() => {
         preview.play();
       } catch (_e) {
       }
-    } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
-      preview.contentWindow.postMessage(
-        JSON.stringify({ event: "command", func: "playVideo", args: [] }),
-        "*"
-      );
+    } else if (preview instanceof HTMLIFrameElement) {
+      ytCommand(preview, "playVideo");
     }
   }
   function observePreview(el, src, inner) {

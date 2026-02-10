@@ -400,6 +400,7 @@ function buildPreviewYouTubeIframe(src: string): HTMLIFrameElement | null {
   const id = getYouTubeId(src);
   if (!id) return null;
 
+  const pageOrigin = typeof window !== "undefined" ? window.location.origin : "";
   const params = new URLSearchParams({
     autoplay: "1",
     mute: "1",
@@ -412,6 +413,7 @@ function buildPreviewYouTubeIframe(src: string): HTMLIFrameElement | null {
     showinfo: "0",
     disablekb: "1",
     enablejsapi: "1",
+    origin: pageOrigin,
     iv_load_policy: "3",
     fs: "0",
     cc_load_policy: "0",
@@ -499,6 +501,17 @@ function startPreview(el: VideoElement, src: string, inner: HTMLElement): void {
 }
 
 /**
+ * Send a command to a YouTube iframe via postMessage
+ */
+function ytCommand(iframe: HTMLIFrameElement, func: string): void {
+  if (!iframe.contentWindow) return;
+  iframe.contentWindow.postMessage(
+    JSON.stringify({ event: "command", func, args: "" }),
+    YT_PRIVACY_DOMAIN
+  );
+}
+
+/**
  * Pause the preview player (called when modal opens)
  */
 function pausePreview(el: VideoElement): void {
@@ -507,11 +520,8 @@ function pausePreview(el: VideoElement): void {
 
   if (preview instanceof HTMLVideoElement) {
     preview.pause();
-  } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
-    preview.contentWindow.postMessage(
-      JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
-      "*"
-    );
+  } else if (preview instanceof HTMLIFrameElement) {
+    ytCommand(preview, "pauseVideo");
   }
 }
 
@@ -524,11 +534,8 @@ function resumePreview(el: VideoElement): void {
 
   if (preview instanceof HTMLVideoElement) {
     try { preview.play(); } catch (_e) { /* ignore */ }
-  } else if (preview instanceof HTMLIFrameElement && preview.contentWindow) {
-    preview.contentWindow.postMessage(
-      JSON.stringify({ event: "command", func: "playVideo", args: [] }),
-      "*"
-    );
+  } else if (preview instanceof HTMLIFrameElement) {
+    ytCommand(preview, "playVideo");
   }
 }
 
