@@ -328,7 +328,7 @@ npm run build    # Build all props
 
 The `dist/` folder is committed to git. jsDelivr serves files directly from the GitHub repo — no npm needed.
 
-**IMPORTANT: Always run `npm run build` before committing.** The built files in `dist/` are what jsDelivr serves.
+**Building is automated.** A GitHub Actions workflow (`.github/workflows/build.yml`) runs `npm run build` and commits the `dist/` folder whenever source files are pushed to `main`. You do NOT need to build locally or commit `dist/` — just push source changes and the bot handles the rest.
 
 Props are available via jsDelivr GitHub CDN at:
 ```
