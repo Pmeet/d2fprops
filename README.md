@@ -6,7 +6,7 @@ A collection of attribute-based props for Webflow. Each prop adds powerful funct
 
 | Prop | Description | Docs |
 |------|-------------|------|
-| [video](#video) | YouTube & video file player with modal/inline modes | [View](src/props/video/README.md) |
+| video | YouTube & video file player with modal, inline, and preview modes | [View docs](src/props/video/README.md) |
 
 *More props coming soon.*
 
@@ -14,38 +14,33 @@ A collection of attribute-based props for Webflow. Each prop adds powerful funct
 
 ## Installation
 
-Load only the props you need. Each prop is independent.
-
-### CDN (Recommended for Webflow)
+Load only the props you need. Each prop is independent. Add the script to your Webflow site's **Custom Code** section (Project Settings > before `</body>`):
 
 ```html
-<!-- Video prop (all-in-one, includes CSS) -->
-<script defer src="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.bundle.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/Pmeet/d2fprops@main/dist/video/video.bundle.min.js"></script>
 ```
 
-Or load CSS separately for better performance:
+Each prop's README has detailed installation and usage instructions.
 
-```html
-<!-- In <head> -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.min.css">
+---
 
-<!-- Before </body> -->
-<script defer src="https://cdn.jsdelivr.net/npm/d2fprops/dist/video/video.min.js"></script>
-```
+## How It Works
 
-## Props
+1. Add a script tag for the prop you need
+2. Add `data-*` attributes to your Webflow elements
+3. The prop auto-initializes on page load — no custom code needed
 
-### Video
+All styling inherits from your Webflow classes by default, so your existing design stays intact.
 
-Attribute-based video player. Supports YouTube and direct video files with modal or inline playback.
+---
 
-**Full documentation:** [src/props/video/README.md](src/props/video/README.md)
+## Development
 
+See [AI.md](./AI.md) for architecture details, build system, and how to add new props.
 
+**Building is automated.** A GitHub Actions workflow rebuilds `dist/` on every push to `main`. Just push source changes.
 
-## Contributing
-
-See [AI.md](./AI.md) for architecture details and contribution guidelines.
+---
 
 ## License
 

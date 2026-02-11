@@ -228,7 +228,7 @@ npm run build
 
 ### video
 
-**Purpose:** Attribute-based video player with modal/inline playback
+**Purpose:** Attribute-based video player with modal, inline, and preview playback
 
 **Location:** `src/props/video/`
 
@@ -251,6 +251,10 @@ npm run build
 - Uses `getAttr()` helper to check new attribute first, then legacy
 - Selects both `[data-vdo]` and `[data-video]` elements
 - CSS targets both attribute selectors
+- `border-radius` is set to `inherit` so Webflow classes control rounding
+- Preview mode uses `IntersectionObserver` with 200px bottom margin to pre-load before viewport
+- Preview mode skips poster/thumbnail loading (video loads before user sees it)
+- Preview pauses when modal opens, resumes on close (YouTube via postMessage, HTML5 via `.pause()`/`.play()`)
 
 ---
 
@@ -279,7 +283,7 @@ npm run build    # Build all props
 3. **Backwards compatible** — Never break existing implementations
 4. **Accessible** — Keyboard nav, ARIA, focus management
 5. **Webflow-native** — Works in Designer, no code required
-6. **Lazy loading** — Iframes use `loading="lazy"`
+6. **Lazy loading** — Iframes use `loading="lazy"`, preview mode uses `IntersectionObserver`
 7. **No conflicts** — All classes/vars prefixed with `d2f-{prop}`
 8. **Privacy-conscious** — YouTube uses `youtube-nocookie.com`
 

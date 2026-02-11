@@ -540,7 +540,7 @@ function resumePreview(el: VideoElement): void {
 }
 
 /**
- * Observe element visibility and start preview when ~5% visible from viewport top
+ * Observe element visibility and start preview 200px before it enters the viewport
  */
 function observePreview(el: HTMLElement, src: string, inner: HTMLElement): void {
   const observer = new IntersectionObserver(
@@ -553,7 +553,7 @@ function observePreview(el: HTMLElement, src: string, inner: HTMLElement): void 
         }
       }
     },
-    { rootMargin: "-5% 0px 0px 0px", threshold: 0 }
+    { rootMargin: "0px 0px 200px 0px", threshold: 0 }
   );
   observer.observe(el);
 }
@@ -578,6 +578,11 @@ function initOne(el: VideoElement): void {
   const isLegacy = el.hasAttribute(ATTR_LEGACY.ROOT);
   const ATTR = isLegacy ? ATTR_LEGACY : ATTR_NEW;
 
+  // Parse options with fallback to legacy attributes
+  const mode = (getAttr(el, ATTR_NEW.MODE, ATTR_LEGACY.MODE) || "modal").toLowerCase();
+  const autoplay = (getAttr(el, ATTR_NEW.AUTOPLAY, ATTR_LEGACY.AUTOPLAY) || "1") === "1";
+  const muted = (getAttr(el, ATTR_NEW.MUTED, ATTR_LEGACY.MUTED) || "0") === "1";
+
   // Set up aspect ratio
   const ratioStr = getAttr(el, ATTR_NEW.RATIO, ATTR_LEGACY.RATIO);
   const pt = parseRatioToPaddingTop(ratioStr);
@@ -586,8 +591,10 @@ function initOne(el: VideoElement): void {
     el.setAttribute(ATTR.HAS_RATIO, "1");
   }
 
-  // Set poster (async for YouTube)
-  setPosterIfNeeded(el, src);
+  // Set poster (skip for preview mode — video loads before user sees it)
+  if (mode !== "preview") {
+    setPosterIfNeeded(el, src);
+  }
 
   // Create inner mount (use consistent class name internally)
   if (!el.querySelector(`.${CSS_PREFIX}__inner`)) {
@@ -595,11 +602,6 @@ function initOne(el: VideoElement): void {
     inner.className = `${CSS_PREFIX}__inner`;
     el.appendChild(inner);
   }
-
-  // Parse options with fallback to legacy attributes
-  const mode = (getAttr(el, ATTR_NEW.MODE, ATTR_LEGACY.MODE) || "modal").toLowerCase();
-  const autoplay = (getAttr(el, ATTR_NEW.AUTOPLAY, ATTR_LEGACY.AUTOPLAY) || "1") === "1";
-  const muted = (getAttr(el, ATTR_NEW.MUTED, ATTR_LEGACY.MUTED) || "0") === "1";
 
   // Accessibility
   if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
