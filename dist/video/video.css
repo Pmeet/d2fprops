@@ -78,6 +78,46 @@
 }
 
 /* ================================
+   Cover Fit Mode
+   ================================ */
+
+/* Ensure inner container clips overflow for cover mode */
+[data-vdo].d2f-video--cover .d2f-video__inner,
+[data-video].d2f-video--cover .d2f-video__inner {
+  overflow: hidden;
+}
+
+/* Native object-fit for HTML5 video */
+[data-vdo].d2f-video--cover video,
+[data-video].d2f-video--cover video {
+  object-fit: cover;
+}
+
+/* CSS scaling trick for iframes (object-fit doesn't work on iframes) */
+[data-vdo].d2f-video--cover .d2f-video__inner iframe,
+[data-video].d2f-video--cover .d2f-video__inner iframe {
+  width: 300%;
+  height: 300%;
+  max-width: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Override preview mode's scale(1.15) when cover is active */
+[data-vdo].d2f-video--cover[data-vdo-mode="preview"] .d2f-video__inner iframe,
+[data-video].d2f-video--cover[data-video-mode="preview"] .d2f-video__inner iframe {
+  width: 300%;
+  height: 300%;
+  max-width: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ================================
    Modal Overlay
    ================================ */
 
