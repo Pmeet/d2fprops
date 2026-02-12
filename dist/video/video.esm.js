@@ -8,7 +8,8 @@ var ATTR_LEGACY = {
   RATIO: "data-vdo-ratio",
   POSTER: "data-vdo-poster",
   PLAY_TOGGLE: "data-vdo-play-toggle",
-  HAS_RATIO: "data-vdo-has-ratio"
+  HAS_RATIO: "data-vdo-has-ratio",
+  FIT: "data-vdo-fit"
 };
 var ATTR_NEW = {
   ROOT: "data-video",
@@ -19,7 +20,8 @@ var ATTR_NEW = {
   RATIO: "data-video-ratio",
   POSTER: "data-video-poster",
   PLAY_TOGGLE: "data-video-play-toggle",
-  HAS_RATIO: "data-video-has-ratio"
+  HAS_RATIO: "data-video-has-ratio",
+  FIT: "data-video-fit"
 };
 function getAttr(el, newAttr, legacyAttr) {
   return el.getAttribute(newAttr) ?? el.getAttribute(legacyAttr);
@@ -382,6 +384,10 @@ function initOne(el) {
   if (pt) {
     el.style.setProperty("--d2f-video-pt", pt);
     el.setAttribute(ATTR.HAS_RATIO, "1");
+  }
+  const fit = getAttr(el, ATTR_NEW.FIT, ATTR_LEGACY.FIT);
+  if (fit === "cover") {
+    el.classList.add(`${CSS_PREFIX}--cover`);
   }
   if (mode !== "preview") {
     setPosterIfNeeded(el, src);
