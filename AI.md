@@ -245,6 +245,7 @@ npm run build
 | `data-vdo-muted` | `data-video-muted` | `1` or `0` |
 | `data-vdo-ratio` | `data-video-ratio` | e.g., `16/9` |
 | `data-vdo-poster` | `data-video-poster` | Custom poster URL |
+| `data-vdo-fit` | `data-video-fit` | Video sizing: `cover` (fill container, crop overflow) |
 | `data-vdo-play-toggle` | `data-video-play-toggle` | Elements to hide on play |
 
 **Key implementation details:**

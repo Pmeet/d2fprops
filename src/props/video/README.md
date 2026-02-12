@@ -46,6 +46,7 @@ That's it! Click the element to play the video in a modal.
 | `data-vdo-muted` | Start muted: `1` or `0` | `0` |
 | `data-vdo-ratio` | Aspect ratio: `16/9`, `4/3`, `1/1`, etc. | `16/9` |
 | `data-vdo-poster` | Custom thumbnail image URL (not used in preview mode) | Auto-detected for YouTube |
+| `data-vdo-fit` | Video sizing: `cover` (fill container, crop overflow) | — (default: contain) |
 | `data-vdo-play-toggle` | Add to child elements to hide them when playing | — |
 
 Both `data-vdo-*` (legacy) and `data-video-*` (new) attribute prefixes are supported. All examples below use `data-vdo-*` but `data-video-*` works identically.
@@ -85,6 +86,14 @@ A muted, looping video plays automatically as the user scrolls near the element.
 
 ```html
 <div data-video data-video-src="https://example.com/video.mp4" data-video-mode="preview"></div>
+```
+
+### Preview with Cover Fit
+
+When the container has a non-16:9 aspect ratio (e.g., a wider/shorter div), the video may not fill the container completely. Use `data-vdo-fit="cover"` to make the video fill the entire container like `object-fit: cover`, cropping overflow:
+
+```html
+<div data-vdo data-vdo-src="https://www.youtube.com/watch?v=VIDEO_ID" data-vdo-mode="preview" data-vdo-fit="cover"></div>
 ```
 
 ---

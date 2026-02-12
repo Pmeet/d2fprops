@@ -26,6 +26,7 @@ const ATTR_LEGACY = {
   POSTER: "data-vdo-poster",
   PLAY_TOGGLE: "data-vdo-play-toggle",
   HAS_RATIO: "data-vdo-has-ratio",
+  FIT: "data-vdo-fit",
 } as const;
 
 // New attributes (data-video-*)
@@ -39,6 +40,7 @@ const ATTR_NEW = {
   POSTER: "data-video-poster",
   PLAY_TOGGLE: "data-video-play-toggle",
   HAS_RATIO: "data-video-has-ratio",
+  FIT: "data-video-fit",
 } as const;
 
 /**
@@ -589,6 +591,12 @@ function initOne(el: VideoElement): void {
   if (pt) {
     el.style.setProperty("--d2f-video-pt", pt);
     el.setAttribute(ATTR.HAS_RATIO, "1");
+  }
+
+  // Apply fit mode
+  const fit = getAttr(el, ATTR_NEW.FIT, ATTR_LEGACY.FIT);
+  if (fit === "cover") {
+    el.classList.add(`${CSS_PREFIX}--cover`);
   }
 
   // Set poster (skip for preview mode — video loads before user sees it)
