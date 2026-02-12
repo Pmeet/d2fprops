@@ -361,7 +361,7 @@ function observePreview(el, src, inner) {
         }
       }
     },
-    { rootMargin: "-5% 0px 0px 0px", threshold: 0 }
+    { rootMargin: "0px 0px 200px 0px", threshold: 0 }
   );
   observer.observe(el);
 }
@@ -374,21 +374,23 @@ function initOne(el) {
     return;
   const isLegacy = el.hasAttribute(ATTR_LEGACY.ROOT);
   const ATTR = isLegacy ? ATTR_LEGACY : ATTR_NEW;
+  const mode = (getAttr(el, ATTR_NEW.MODE, ATTR_LEGACY.MODE) || "modal").toLowerCase();
+  const autoplay = (getAttr(el, ATTR_NEW.AUTOPLAY, ATTR_LEGACY.AUTOPLAY) || "1") === "1";
+  const muted = (getAttr(el, ATTR_NEW.MUTED, ATTR_LEGACY.MUTED) || "0") === "1";
   const ratioStr = getAttr(el, ATTR_NEW.RATIO, ATTR_LEGACY.RATIO);
   const pt = parseRatioToPaddingTop(ratioStr);
   if (pt) {
     el.style.setProperty("--d2f-video-pt", pt);
     el.setAttribute(ATTR.HAS_RATIO, "1");
   }
-  setPosterIfNeeded(el, src);
+  if (mode !== "preview") {
+    setPosterIfNeeded(el, src);
+  }
   if (!el.querySelector(`.${CSS_PREFIX}__inner`)) {
     const inner2 = document.createElement("div");
     inner2.className = `${CSS_PREFIX}__inner`;
     el.appendChild(inner2);
   }
-  const mode = (getAttr(el, ATTR_NEW.MODE, ATTR_LEGACY.MODE) || "modal").toLowerCase();
-  const autoplay = (getAttr(el, ATTR_NEW.AUTOPLAY, ATTR_LEGACY.AUTOPLAY) || "1") === "1";
-  const muted = (getAttr(el, ATTR_NEW.MUTED, ATTR_LEGACY.MUTED) || "0") === "1";
   if (!el.hasAttribute("tabindex"))
     el.setAttribute("tabindex", "0");
   if (!el.hasAttribute("role"))
