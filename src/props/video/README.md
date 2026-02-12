@@ -104,10 +104,7 @@ For `<video>` elements, native `object-fit: cover` is applied. For `<iframe>` el
 |----------|-------|
 | `width` | `200%` |
 | `height` | `200%` |
-| `top` | `27.5%` |
-| `left` | `27.5%` |
 | `transform` | `translate(-27.5%, -27.5%)` |
-| `position` | `absolute` |
 | `max-width` | `none` |
 
 These values are optimized for 4:3 containers with 16:9 video content. If you need different values for a different container ratio, override them with a custom CSS rule targeting `.d2f-video--cover .d2f-video__inner iframe`.
