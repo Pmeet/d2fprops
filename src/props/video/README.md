@@ -96,6 +96,22 @@ When the container has a non-16:9 aspect ratio (e.g., a wider/shorter div), the 
 <div data-vdo data-vdo-src="https://www.youtube.com/watch?v=VIDEO_ID" data-vdo-mode="preview" data-vdo-fit="cover"></div>
 ```
 
+**How cover fit works for iframes:**
+
+For `<video>` elements, native `object-fit: cover` is applied. For `<iframe>` elements (YouTube embeds), `object-fit` doesn't work, so the following CSS values are applied to the iframe:
+
+| Property | Value |
+|----------|-------|
+| `width` | `200%` |
+| `height` | `200%` |
+| `top` | `27.5%` |
+| `left` | `27.5%` |
+| `transform` | `translate(-27.5%, -27.5%)` |
+| `position` | `absolute` |
+| `max-width` | `none` |
+
+These values are optimized for 4:3 containers with 16:9 video content. If you need different values for a different container ratio, override them with a custom CSS rule targeting `.d2f-video--cover .d2f-video__inner iframe`.
+
 ---
 
 ## More Examples
